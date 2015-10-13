@@ -1,0 +1,204 @@
+drop database LEASINGCOMPANY;
+
+create database LEASINGCOMPANY;
+
+use LEASINGCOMPANY;
+
+
+create table RECOVERYOFFICER(
+recoveryofficerid varchar(30) not null,
+name varchar(250) not null,
+nic varchar(11) not null,
+address varchar(250) not null,
+telno varchar(20) not null,
+constraint primary key(recoveryofficerid)
+)ENGINE=INNODB;
+
+
+create table MARKETINGOFFICER(
+marketingofficerid varchar(30) not null,
+name varchar(250) not null,
+nic varchar(11) not null,
+address varchar(250) not null,
+telno varchar(20) not null,
+constraint primary key(marketingofficerid)
+)ENGINE=INNODB;
+
+
+create table CLIENT(
+clientid varchar(30) not null,
+recoveryofficerid varchar(30) not null,
+marketingofficerid varchar(30) not null,
+clientname varchar(250) not null,
+nic varchar(11) not null,
+occupation varchar(75) not null,
+privateaddress varchar(250) not null,
+officialaddress varchar(250),
+contactno varchar(20),
+organizationtype varchar(100),
+residentduration varchar(100) not null,
+statusinpvtaddress varchar(100) not null,
+citizenship varchar(20) not null,
+age int not null,
+maritalstatus varchar(30) not null,
+incomesource varchar(300) not null,
+totalmonthlyincome decimal(10,2) not null,
+constraint primary key(clientid,recoveryofficerid),
+constraint foreign key(recoveryofficerid) references RECOVERYOFFICER(recoveryofficerid) on update cascade,
+constraint foreign key(marketingofficerid) references MARKETINGOFFICER(marketingofficerid) on update cascade
+)ENGINE=INNODB;
+
+
+create table CLIENTBANKERS(
+clientid varchar(30) not null,
+bankname varchar(50) not null,
+address varchar(100) not null,
+accountno varchar(30) not null,
+constraint primary key(clientid,accountno),
+constraint foreign key(clientid) references CLIENT(clientid) on update cascade
+)ENGINE=INNODB;
+
+
+create table LEASING(
+leasingno varchar(30) not null,
+clientid varchar(30) not null,
+noofpayments int not null,
+totalleasedcost decimal(10,2) not null,
+commencedate varchar(30) not null,
+enddate varchar(30) not null,
+downpayment decimal(10,2) not null,
+rentalfee decimal(10,2) not null,
+duedate varchar(12) not null,
+constraint primary key(leasingno,clientid),
+constraint foreign key(clientid) references CLIENT(clientid) on update cascade
+)ENGINE=INNODB;
+
+
+create table RENTALPAYMENT(
+leasingno varchar(30) not null,
+rentalarrears decimal(10,2) not null,
+percentofreceived decimal(10,2) not null,
+rentalodinterest decimal(10,2) not null,
+totalarrears decimal(10,2) not null,
+rentalod decimal(10,2) not null,
+sundryod decimal(10,2) not null,
+paiddate varchar(30) not null,
+paidtime varchar(30) not null,
+payment decimal(10,2) not null,
+constraint primary key(leasingno,paiddate,paidtime),
+constraint foreign key(leasingno) references LEASING(leasingno) on update cascade
+)ENGINE=INNODB;
+
+
+create table VEHICLECATEGORY(
+vehiclecategoryid varchar(20) not null,
+description varchar(200) not null,
+constraint primary key(vehiclecategoryid)
+)ENGINE=INNODB;
+
+
+create table LEASEDVEHICLE(
+leasingno varchar(30) not null,
+vehiclecategoryid varchar(20) not null,
+modelandname varchar(150) not null,
+chassisno varchar(100) not null,
+registrationno varchar(30) not null,
+engineno varchar(100) not null,
+manufacturedyear int not null,
+estimatedprice decimal(10,2) not null,
+colour varchar(30) not null,
+fuelused decimal(5,3) not null,
+cylindercapacity decimal(5,2) not null,
+wheelbase decimal(3,2),
+licenseddate varchar(11) not null,
+constraint primary key(leasingno),
+constraint foreign key(vehiclecategoryid) references VEHICLECATEGORY(vehiclecategoryid) on update cascade,
+constraint foreign key(leasingno) references LEASING(leasingno) on update cascade
+)ENGINE=INNODB;
+
+
+create table INSURANCE(
+leasingno varchar(30) not null,
+insuaranceno varchar(30) not null,
+policyfee decimal(10,2) not null,
+duedate varchar(15) not null,
+paid varchar(10), 
+constraint primary key(leasingno ,insuaranceno),
+constraint foreign key(leasingno) references LEASEDVEHICLE(leasingno) on update cascade
+)ENGINE=INNODB;
+
+
+create table CLIENTVEHICLE(
+clientid varchar(30) not null,
+clientvehicleid varchar(20) not null,
+typenameandmodel varchar(100) not null,
+purchasedprice decimal(10,2) not null,
+marketvalue decimal(10,2) not null,
+mortgagestatus varchar(10) not null,
+constraint primary key(clientid,clientvehicleid),
+constraint foreign key(clientid) references CLIENT(clientid) on update cascade
+)ENGINE=INNODB;
+
+
+create table CLIENTINCOMETAX(
+clientid varchar(30) not null,
+year int not null,
+taxableincome decimal(10,2) not null,
+taxpaid decimal(10,2) not null,
+constraint primary key(clientid,year),
+constraint foreign key(clientid) references CLIENT(clientid) on update cascade
+)ENGINE=INNODB;
+
+
+create table GUARENTOR(
+leasingno varchar(30) not null,
+guarentorid varchar(30) not null,
+guarentorname varchar(250) not null,
+nic varchar(11) not null,
+occupation varchar(75) not null,
+privateaddress varchar(250) not null,
+officialaddress varchar(250),
+contactno varchar(20),
+organizationtype varchar(100),
+residentduration varchar(100) not null,
+statusinpvtaddress varchar(100) not null,
+citizenship varchar(20) not null,
+age int not null,
+maritalstatus varchar(30) not null,
+incomesource varchar(300) not null,
+totalmonthlyincome decimal(10,2) not null,
+constraint primary key(leasingno,guarentorid),
+constraint foreign key(leasingno) references LEASING(leasingno) on update cascade
+)ENGINE=INNODB;
+
+
+create table GUARENTORBANKERS(
+guarentorid varchar(30) not null,
+bankname varchar(50) not null,
+address varchar(100) not null,
+accountno varchar(30) not null,
+constraint primary key(guarentorid,accountno)
+)ENGINE=INNODB;
+
+
+create table GUARENTORVEHICLE(
+guarentorid varchar(30) not null,
+guarentorvehicleid varchar(20) not null,
+typenameandmodel varchar(100) not null,
+purchasedprice decimal(10,2) not null,
+marketvalue decimal(10,2) not null,
+mortgagestatus varchar(10) not null,
+constraint primary key(guarentorid,guarentorvehicleid)
+)ENGINE=INNODB;
+
+
+create table GUARENTORINCOMETAX(
+guarentorid varchar(30) not null,
+year int not null,
+taxableincome decimal(10,2) not null,
+taxpaid decimal(10,2) not null,
+constraint primary key(guarentorid,year)
+)ENGINE=INNODB;
+
+
+
